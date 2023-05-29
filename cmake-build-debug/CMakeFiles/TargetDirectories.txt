@@ -1,0 +1,3 @@
+/Users/lixinzhuang1/CLionProjects/mysqlite/cmake-build-debug/CMakeFiles/mysqlite.dir
+/Users/lixinzhuang1/CLionProjects/mysqlite/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/lixinzhuang1/CLionProjects/mysqlite/cmake-build-debug/CMakeFiles/rebuild_cache.dir
