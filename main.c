@@ -114,13 +114,7 @@ void* row_slot(Table* table, uint32_t row_num) {
 }
 
 
-MetaCommandResult do_meta_command(InputBuffer *input_buffer) {
-    if (strcmp(input_buffer->buffer, ".exit") == 0) {
-        exit(EXIT_SUCCESS);
-    } else {
-        return META_COMMAND_UNRECOGNIZED_COMMAND;
-    }
-}
+
 
 // 校验输入的语句的类型
 PrepareResult prepare_statement(InputBuffer *input_buffer, Statement *statement) {
@@ -192,6 +186,16 @@ void free_table(Table* table) {
         free(table -> pages[i]);
     }
     free(table);
+}
+
+MetaCommandResult do_meta_command(InputBuffer *input_buffer) {
+    if (strcmp(input_buffer->buffer, ".exit") == 0) {
+        close_input_buffer(input_buffer);
+        free_table(new_table());
+        exit(EXIT_SUCCESS);
+    } else {
+        return META_COMMAND_UNRECOGNIZED_COMMAND;
+    }
 }
 
 int main() {
