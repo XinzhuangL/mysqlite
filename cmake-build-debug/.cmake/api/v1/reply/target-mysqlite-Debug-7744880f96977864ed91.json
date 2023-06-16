@@ -10,7 +10,8 @@
 	{
 		"commands" : 
 		[
-			"add_executable"
+			"add_executable",
+			"target_link_libraries"
 		],
 		"files" : 
 		[
@@ -24,7 +25,13 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 6,
+				"line" : 17,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 19,
 				"parent" : 0
 			}
 		]
@@ -56,6 +63,13 @@
 			]
 		}
 	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 2,
+			"id" : "external_file::@6890427a1f51a3e7e1df"
+		}
+	],
 	"id" : "mysqlite::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
@@ -68,6 +82,11 @@
 			{
 				"fragment" : "",
 				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "libexternal_file.a",
+				"role" : "libraries"
 			}
 		],
 		"language" : "C"

@@ -1,11 +1,15 @@
 # ninja log v5
-0	85	1685360667763072645	CMakeFiles/mysqlite.dir/main.c.o	2ff48a47c294defe
-85	166	1685360667845176765	mysqlite	1c454a43fa2cac9f
-1	389	1685362336741998268	CMakeFiles/mysqlite.dir/main.c.o	2ff48a47c294defe
-389	502	1685362336856922971	mysqlite	1c454a43fa2cac9f
-1	98	1685362373409213456	CMakeFiles/mysqlite.dir/main.c.o	2ff48a47c294defe
-98	175	1685362373488730269	mysqlite	1c454a43fa2cac9f
-2	150	1685364460023582979	CMakeFiles/mysqlite.dir/main.c.o	2ff48a47c294defe
-150	234	1685364460109869238	mysqlite	1c454a43fa2cac9f
-0	99	1685544747486130157	CMakeFiles/mysqlite.dir/main.c.o	2ff48a47c294defe
-99	447	1685544747835253661	mysqlite	1c454a43fa2cac9f
+298	423	1686219559369924643	mysqlite	3833b29ea53088ff
+2	137	1686219559081378325	CMakeFiles/mysqlite.dir/main.c.o	2ff48a47c294defe
+3	92	1686191201415188741	CMakeFiles/process_input.dir/process_input.c.o	b2bc47dbfb82016e
+0	198	1686901003115699636	build.ninja	1147d62e7e6f15a5
+92	130	1686191201458230000	libprocess_input.a	55cb39cba9297dc6
+1	75	1686214901968360222	CMakeFiles/mysqlite.dir/common.c.o	e5a5d150d6e2f4c4
+2	145	1686219559090309914	CMakeFiles/external_file.dir/statement.c.o	5bd533cf86e5153f
+2	87	1686217414220650377	CMakeFiles/external_file.dir/table.c.o	487aee9157b1a353
+2	77	1686214901970446540	CMakeFiles/mysqlite.dir/table.c.o	7744ef25a298e500
+13	131	1686217173952405886	CMakeFiles/external_file.dir/input.c.o	8213df09a08d50b
+1	135	1686219559079966288	CMakeFiles/external_file.dir/common.c.o	263ad04b33993742
+145	298	1686219559247532000	libexternal_file.a	a7dfd4dba596adfb
+0	74	1686214901967472460	CMakeFiles/mysqlite.dir/input.c.o	e95c929fa94ae23b
+1	76	1686214901970855864	CMakeFiles/mysqlite.dir/statement.c.o	1d9889a674d022c9

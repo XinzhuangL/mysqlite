@@ -3,4 +3,17 @@ project(mysqlite C)
 
 set(CMAKE_C_STANDARD 11)
 
+add_library(external_file
+        input.h
+        input.c
+        common.c
+        common.h
+        statement.h
+        statement.c
+#        table.c
+#        table.h
+        )
+
 add_executable(mysqlite main.c)
+
+target_link_libraries(mysqlite external_file)

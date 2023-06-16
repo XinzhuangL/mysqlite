@@ -15,7 +15,8 @@
 					"source" : ".",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -30,7 +31,8 @@
 					"name" : "mysqlite",
 					"targetIndexes" : 
 					[
-						0
+						0,
+						1
 					]
 				}
 			],
@@ -38,8 +40,15 @@
 			[
 				{
 					"directoryIndex" : 0,
+					"id" : "external_file::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-external_file-Debug-1a8bf025a2aae9646533.json",
+					"name" : "external_file",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
 					"id" : "mysqlite::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-mysqlite-Debug-be0657332ed34e623e6a.json",
+					"jsonFile" : "target-mysqlite-Debug-7744880f96977864ed91.json",
 					"name" : "mysqlite",
 					"projectIndex" : 0
 				}
