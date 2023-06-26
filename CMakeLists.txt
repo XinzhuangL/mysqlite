@@ -6,12 +6,14 @@ set(CMAKE_C_STANDARD 11)
 add_library(external_file
         input.h
         input.c
-        common.c
-        common.h
+        command.c
+        command.h
         statement.h
         statement.c
 #        table.c
 #        table.h
+        table.h
+        table.c
         )
 
 add_executable(mysqlite main.c)
