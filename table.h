@@ -1,6 +1,7 @@
 #ifndef TABLE_H
 #define TABLE_H
 
+#include "tree_node.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -9,66 +10,64 @@
 #include <unistd.h>
 #include <sys/errno.h>
 
-#define size_of_attribute(Struct, Attribute) sizeof(((Struct *)0) -> Attribute)
-#define COLUMN_USERNAME_SIZE 32
-#define COLUMN_EMAIL_SIZE 255
-// 表容纳的最大page数
-
-#define TABLE_MAX_PAGES 100
 
 typedef struct {
+    uint32_t num_pages;
     int file_descriptor;
     uint32_t file_length;
-    void* pages[TABLE_MAX_PAGES];
+    void *pages[TABLE_MAX_PAGES];
 } Pager;
 
 
 typedef struct {
-    uint32_t id;
-    char username[COLUMN_USERNAME_SIZE + 1];
-    char email[COLUMN_EMAIL_SIZE + 1];
-} Row;
+//    uint32_t num_rows;
+//    void *pages[TABLE_MAX_PAGES];
+    Pager *pager;
+    uint32_t root_page_num;  // 表有多少个page
+} Table;
 
 
 typedef struct {
-    uint32_t num_rows;
-//    void *pages[TABLE_MAX_PAGES];
-    Pager* pager;
-} Table;
+    Table *table;
+//    uint32_t row_num;
+    uint32_t page_num;
+    uint32_t cell_num;
+    bool end_of_table;  // Indicates a position one past the last element
+} Cursor;
 
-extern const uint32_t ID_SIZE ;
-extern const uint32_t USERNAME_SIZE;
-extern const uint32_t EMAIL_SIZE;
-extern const uint32_t ID_OFFSET ;
-extern const uint32_t USERNAME_OFFSET;
-extern const uint32_t EMAIL_OFFSET;
-extern const uint32_t ROW_SIZE;
-// page大小
-extern const uint32_t PAGE_SIZE;
-// page行数
-extern const uint32_t ROWS_PER_PAGE;
-// 表总行数
-extern const uint32_t TABLE_MAX_ROWS;
 
-Table* db_open(const char* filename);
-void db_close(Table* table);
+Table *db_open(const char *filename);
 
-void pager_flush(Pager* pager, uint32_t page_num, uint32_t size);
+void db_close(Table *table);
 
-void* get_page(Pager* pager, uint32_t page_num);
-Pager* pager_open(const char* filename);
+//void pager_flush(Pager* pager, uint32_t page_num, uint32_t size);
+void pager_flush(Pager *pager, uint32_t page_num);
+
+void *get_page(Pager *pager, uint32_t page_num);
+
+Pager *pager_open(const char *filename);
 
 void serialize_row(Row *source, void *destination);
 
 void deserialize_row(void *source, Row *destination);
 
-void *row_slot(Table *table, uint32_t row_num);
+//void *row_slot(Table *table, uint32_t row_num);
+// returns a pointer to the position described by the cursor
+void *cursor_value(Cursor *cursor);
+
+void cursor_advance(Cursor *cursor);
 
 void print_row(Row *row);
 
-void free_table(Table *table);
+//void free_table(Table *table);
+//
+//Table *new_table();
 
-Table *new_table();
+Cursor *table_start(Table *table);
+
+Cursor *table_end(Table *table);
+
+void leaf_node_insert(Cursor *cursor, uint32_t key, Row *row);
 
 
 #endif
