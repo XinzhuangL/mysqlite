@@ -27,7 +27,8 @@ typedef enum {
 
 typedef enum {
     EXECUTE_SUCCESS,
-    EXECUTE_TABLE_FULL
+    EXECUTE_TABLE_FULL,
+    EXECUTE_DUPLICATE_KEY
 } ExecuteResult;
 
 // 校验输入的类型，只支持select 和 insert insert时将语句内容写入statement

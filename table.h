@@ -52,7 +52,7 @@ void serialize_row(Row *source, void *destination);
 void deserialize_row(void *source, Row *destination);
 
 //void *row_slot(Table *table, uint32_t row_num);
-// returns a pointer to the position described by the cursor
+// returns a pointer to the position described by thee cursor
 void *cursor_value(Cursor *cursor);
 
 void cursor_advance(Cursor *cursor);
@@ -65,9 +65,16 @@ void print_row(Row *row);
 
 Cursor *table_start(Table *table);
 
-Cursor *table_end(Table *table);
+//Cursor *table_end(Table *table);
+
+Cursor* table_find(Table* table, uint32_t key);
+
+
+
 
 void leaf_node_insert(Cursor *cursor, uint32_t key, Row *row);
+
+Cursor* leaf_node_find(Table* table, uint32_t page_num, uint32_t key);
 
 
 #endif

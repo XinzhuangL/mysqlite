@@ -91,5 +91,9 @@ void *leaf_node_value(void *node, uint32_t cell_num);
 
 void initialize_leaf_node(void *node);
 
+NodeType get_node_type(void* node);
+
+void set_node_type(void* node, NodeType type);
+
 
 #endif //MYSQLITE_TREE_NODE_H

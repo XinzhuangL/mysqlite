@@ -59,16 +59,26 @@ ExecuteResult execute_insert(Statement *statement, Table *table) {
 //        return EXECUTE_TABLE_FULL;
 //    }
     void *node = get_page(table->pager, table->root_page_num);
-    if ((*leaf_node_num_cells(node)) >= LEAF_NODE_MAX_CELLS) {
+    uint32_t num_cells = (*leaf_node_num_cells(node));
+    if (num_cells >= LEAF_NODE_MAX_CELLS) {
         return EXECUTE_TABLE_FULL;
     }
     Row *row_to_insert = &(statement->row_to_insert);
     // open a cursor at the end of table
     // write to that cursor location then close the cursor
-    Cursor *cursor = table_end(table);
+//    Cursor *cursor = table_end(table);
 //    serialize_row(row_to_insert, row_slot(table, table ->num_rows));
 //    serialize_row(row_to_insert, cursor_value(cursor));
 //    table -> num_rows += 1;
+    uint32_t key_to_insert = row_to_insert->id;
+    Cursor *cursor = table_find(table, key_to_insert);
+
+    if (cursor->cell_num < num_cells) {
+        uint32_t key_at_index = *leaf_node_key(node, cursor->cell_num);
+        if (key_at_index == key_to_insert) {
+            return EXECUTE_DUPLICATE_KEY;
+        }
+    }
     leaf_node_insert(cursor, row_to_insert->id, row_to_insert);
     free(cursor);
     return EXECUTE_SUCCESS;
