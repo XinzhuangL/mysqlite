@@ -23,7 +23,7 @@ typedef struct {
 //    uint32_t num_rows;
 //    void *pages[TABLE_MAX_PAGES];
     Pager *pager;
-    uint32_t root_page_num;  // 表有多少个page
+    uint32_t root_page_num;  // 根节点在哪个page
 } Table;
 
 
@@ -75,6 +75,16 @@ Cursor* table_find(Table* table, uint32_t key);
 void leaf_node_insert(Cursor *cursor, uint32_t key, Row *row);
 
 Cursor* leaf_node_find(Table* table, uint32_t page_num, uint32_t key);
+
+void leaf_node_split_and_insert(Cursor* cursor, uint32_t key, Row* value);
+
+/*
+ * Until we start recycling free pages, new pages will always
+ * go onto the end of the database file
+ */
+uint32_t get_unused_page_num(Pager* pager);
+
+void create_new_root(Table* table, uint32_t right_child_page_num);
 
 
 #endif

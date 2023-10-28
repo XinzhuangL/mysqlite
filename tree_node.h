@@ -81,6 +81,30 @@ extern const uint32_t LEAF_NODE_CELL_SIZE;
 extern const uint32_t LEAF_NODE_SPACE_FOR_CELLS;
 extern const uint32_t LEAF_NODE_MAX_CELLS;
 
+
+extern const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT;
+extern const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT;
+
+/*
+ * Internal Node Header Layout
+ * 最右边孩子的指针被存储在头结点
+ */
+extern const uint32_t INTERNAL_NODE_NUM_KEYS_SIZE;
+extern const uint32_t INTERNAL_NODE_NUM_KEYS_OFFSET;
+extern const uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE;
+extern const uint32_t INTERNAL_NODE_RIGHT_CHILD_OFFSET;
+extern const uint32_t INTERNAL_NODE_HEADER_SIZE;
+
+/**
+ *
+ *  Internal Node Body Layout
+ */
+
+extern const uint32_t INTERNAL_NODE_KEY_SIZE;
+extern const uint32_t INTERNAL_NODE_CHILD_SIZE;
+extern const uint32_t INTERNAL_NODE_CELL_SIZE;
+
+
 uint32_t *leaf_node_num_cells(void *node);
 
 void *leaf_node_cell(void *node, uint32_t cell_num);
@@ -91,9 +115,34 @@ void *leaf_node_value(void *node, uint32_t cell_num);
 
 void initialize_leaf_node(void *node);
 
+void initialize_internal_node(void* node);
+
 NodeType get_node_type(void* node);
 
 void set_node_type(void* node, NodeType type);
+
+bool is_node_root(void* node);
+
+void set_node_root(void* node, bool is_root);
+
+uint32_t* internal_node_num_keys(void* node);
+
+uint32_t* internal_node_right_child(void* node);
+
+// 获取第cell_num 个cell_num cell = child + key
+uint32_t* internal_node_cell(void* node, uint32_t cell_num);
+
+// 获取第child_num个孩子
+uint32_t* internal_node_child(void* node, uint32_t child_num);
+
+// 最右边的key
+uint32_t get_node_max_key(void* node);
+
+// 获取第num个key
+uint32_t* internal_node_key(void* node, uint32_t key_num);
+
+
+
 
 
 #endif //MYSQLITE_TREE_NODE_H

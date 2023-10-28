@@ -60,9 +60,9 @@ ExecuteResult execute_insert(Statement *statement, Table *table) {
 //    }
     void *node = get_page(table->pager, table->root_page_num);
     uint32_t num_cells = (*leaf_node_num_cells(node));
-    if (num_cells >= LEAF_NODE_MAX_CELLS) {
-        return EXECUTE_TABLE_FULL;
-    }
+//    if (num_cells >= LEAF_NODE_MAX_CELLS) {
+//        return EXECUTE_TABLE_FULL;
+//    }
     Row *row_to_insert = &(statement->row_to_insert);
     // open a cursor at the end of table
     // write to that cursor location then close the cursor

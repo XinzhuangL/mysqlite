@@ -15,7 +15,7 @@ add_library(external_file
         table.h
         table.c
         tree_node.h
-        tree_node.c)
+        tree_node.c base/db.c)
 
 add_executable(mysqlite main.c)
 

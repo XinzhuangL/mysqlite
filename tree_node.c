@@ -20,7 +20,6 @@ const uint32_t PAGE_SIZE = 4096;
 // page行数
 const uint32_t ROWS_PER_PAGE = PAGE_SIZE / ROW_SIZE;
 // 表总行数
-const uint32_t TABLE_MAX_ROWS = ROWS_PER_PAGE * TABLE_MAX_PAGES;
 
 /*
  * Common Node Header Layout
@@ -54,6 +53,29 @@ const uint32_t LEAF_NODE_CELL_SIZE = LEAF_NODE_KEY_SIZE + LEAF_NODE_VALUE_SIZE;
 const uint32_t LEAF_NODE_SPACE_FOR_CELLS = PAGE_SIZE - LEAF_NODE_HEADER_SIZE;
 const uint32_t LEAF_NODE_MAX_CELLS = LEAF_NODE_SPACE_FOR_CELLS / LEAF_NODE_CELL_SIZE;
 
+// 最终多了一个节点 N个节点 最终分裂成N + 1个，如果N + 1是奇数，则左边节点多一个
+const uint32_t LEAF_NODE_RIGHT_SPLIT_COUNT = (LEAF_NODE_MAX_CELLS + 1) / 2;
+const uint32_t LEAF_NODE_LEFT_SPLIT_COUNT = (LEAF_NODE_MAX_CELLS + 1) - LEAF_NODE_RIGHT_SPLIT_COUNT;
+
+/*
+ * Internal Node Header Layout
+ * 最右边孩子的指针被存储在头结点
+ */
+const uint32_t INTERNAL_NODE_NUM_KEYS_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_NUM_KEYS_OFFSET = COMMON_NODE_HEADER_SIZE;
+const uint32_t INTERNAL_NODE_RIGHT_CHILD_SIZE= sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_RIGHT_CHILD_OFFSET = INTERNAL_NODE_NUM_KEYS_OFFSET + INTERNAL_NODE_NUM_KEYS_SIZE;
+const uint32_t INTERNAL_NODE_HEADER_SIZE = COMMON_NODE_HEADER_SIZE + INTERNAL_NODE_NUM_KEYS_SIZE + INTERNAL_NODE_RIGHT_CHILD_OFFSET;
+
+/**
+ *
+ *  Internal Node Body Layout
+ */
+
+const uint32_t INTERNAL_NODE_KEY_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_CHILD_SIZE = sizeof(uint32_t);
+const uint32_t INTERNAL_NODE_CELL_SIZE = INTERNAL_NODE_CHILD_SIZE + INTERNAL_NODE_KEY_SIZE;
+
 // node 的 cell 个数
 uint32_t *leaf_node_num_cells(void *node) {
     return node + LEAF_NODE_NUM_CELLS_OFFSET;
@@ -73,7 +95,14 @@ void *leaf_node_value(void *node, uint32_t cell_num) {
 
 void initialize_leaf_node(void *node) {
     set_node_type(node, NODE_LEAF);
+    set_node_root(node, false);
     *leaf_node_num_cells(node) = 0;
+}
+
+void initialize_internal_node(void* node) {
+    set_node_type(node, NODE_INTERNAL);
+    set_node_root(node, false);
+    *internal_node_num_keys(node) = 0;
 }
 
 NodeType get_node_type(void* node) {
@@ -84,4 +113,56 @@ NodeType get_node_type(void* node) {
 void set_node_type(void* node, NodeType type) {
     uint8_t  value = type;
     *(uint8_t*)(node + NODE_TYPE_OFFSET) = value;
+}
+
+bool is_node_root(void* node) {
+    uint8_t  value = *((uint8_t*) (node + IS_ROOT_OFFSET));
+    return (bool)value;
+}
+
+void set_node_root(void* node, bool is_root) {
+    uint8_t value = is_root;
+    *((uint8_t*) (node + IS_ROOT_OFFSET)) = value;
+}
+
+
+uint32_t* internal_node_num_keys(void* node) {
+    return node + INTERNAL_NODE_NUM_KEYS_OFFSET;
+}
+
+uint32_t* internal_node_right_child(void* node) {
+    return node + INTERNAL_NODE_RIGHT_CHILD_OFFSET;
+}
+
+// 获取第cell_num 个cell_num cell = child + key
+uint32_t* internal_node_cell(void* node, uint32_t cell_num) {
+    return node +INTERNAL_NODE_HEADER_SIZE + cell_num * INTERNAL_NODE_CELL_SIZE;
+}
+
+// 获取第child_num个孩子
+uint32_t* internal_node_child(void* node, uint32_t child_num) {
+    // 获取内部节点的key个数
+    uint32_t num_keys = *internal_node_num_keys(node);
+    if(child_num > num_keys) {
+        printf("Tried to access child_num %d > num_keys %d\n", child_num, num_keys);
+        exit(EXIT_FAILURE);
+    } else if(child_num == num_keys) {
+        return internal_node_right_child(node);
+    } else {
+        return internal_node_cell(node, child_num);
+    }
+}
+// 最右边的key
+uint32_t get_node_max_key(void* node) {
+    switch (get_node_type(node)) {
+        case NODE_INTERNAL:
+            return *internal_node_key(node, *internal_node_num_keys(node) - 1);
+        case NODE_LEAF:
+            return *leaf_node_key(node, *leaf_node_num_cells(node) - 1);
+    }
+}
+
+// 获取第num个key
+uint32_t* internal_node_key(void* node, uint32_t key_num) {
+    return internal_node_cell(node, key_num) + INTERNAL_NODE_CHILD_SIZE;
 }

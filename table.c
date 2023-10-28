@@ -267,8 +267,10 @@ void leaf_node_insert(Cursor* cursor, uint32_t key, Row* value) {
     uint32_t num_cells = *leaf_node_num_cells(node);
     if(num_cells >= LEAF_NODE_MAX_CELLS) {
         // Node full
-        printf("Need to implement splitting a leaf node. \n");
-        exit(EXIT_FAILURE);
+//        printf("Need to implement splitting a leaf node. \n");
+//        exit(EXIT_FAILURE);
+        leaf_node_split_and_insert(cursor, key, value);
+        return;
     }
     if(cursor -> cell_num < num_cells) {
         // Make room for new cell
@@ -306,6 +308,95 @@ Cursor* leaf_node_find(Table* table, uint32_t page_num, uint32_t key) {
     }
     cursor -> cell_num = min_index;
     return cursor;
+}
+
+// 返回未使用的下一个page，即未当前page的个数
+uint32_t get_unused_page_num(Pager* pager) {
+    return pager -> num_pages;
+}
+
+void leaf_node_split_and_insert(Cursor* cursor, uint32_t key, Row* value) {
+    /*
+     * create a new node and move half the cells over.
+     * Insert the new value in one of the two nodes
+     * Update parent or create a new parent
+     */
+    void* old_node = get_page(cursor -> table -> pager, cursor -> page_num);
+    uint32_t  new_page_num = get_unused_page_num(cursor -> table -> pager);
+    void* new_node = get_page(cursor -> table -> pager, new_page_num);
+    initialize_leaf_node(new_node);
+    /**
+     * All existing keys plus new key should be divided
+     * evenly between old(left) and new (right) nodes
+     * Starting from the right, move each key to correct position
+     */
+     // 从右向左
+     for(int32_t i = LEAF_NODE_MAX_CELLS; i >= 0; i--) {
+         void* destination_node;
+         // 向右边分配
+         if(i >= LEAF_NODE_LEFT_SPLIT_COUNT) {
+             destination_node = new_node;
+         } else {
+             destination_node = old_node;
+         }
+
+         uint32_t index_within_node = i % LEAF_NODE_LEFT_SPLIT_COUNT;
+         // 获取指向cell的指针
+         void* destination = leaf_node_cell(destination_node, index_within_node);
+
+         // 正好为待插入的值
+         // 没看懂
+         if(i == cursor -> cell_num) {
+             serialize_row(value, destination);
+         } else if(i > cursor -> cell_num) {
+             memcpy(destination, leaf_node_cell(old_node, i - 1), LEAF_NODE_CELL_SIZE);
+         } else {
+             memcpy(destination, leaf_node_cell(old_node, i), LEAF_NODE_CELL_SIZE);
+         }
+     }
+
+     *(leaf_node_num_cells(old_node)) = LEAF_NODE_LEFT_SPLIT_COUNT;
+     *(leaf_node_num_cells(new_node)) = LEAF_NODE_RIGHT_SPLIT_COUNT;
+
+     // 判断节点是否是根节点，是根节点则创建新的父节点
+     if(is_node_root(old_node)) {
+         // 传入了右孩子的索引(在哪个page)
+         return create_new_root(cursor -> table, new_page_num);
+     } else {
+         printf("Need to implement updating parent after split\n");
+         exit(EXIT_FAILURE);
+     }
+}
+
+void create_new_root(Table* table, uint32_t right_child_page_num) {
+    /*
+     * Handle splitting the root
+     * Old root copied to new page, becomes left child.
+     * Address of right child passed in.
+     * Re-initialize root page to contain the new root node.
+     * New root node points to two children.
+     */
+    void* root = get_page(table -> pager, table -> root_page_num);
+    void* right_child = get_page(table -> pager, right_child_page_num);
+    uint32_t  left_child_page_num = get_unused_page_num(table -> pager);
+    void* left_child = get_page(table -> pager, left_child_page_num);
+    // old root is copied to the left child so we can reuse the root page
+    memcpy(left_child, root, PAGE_SIZE);
+    set_node_root(left_child, false);
+    /*
+     * Root node is a new internal node with one key and two children
+     */
+    initialize_leaf_node(root);
+    set_node_root(root, true);
+    *internal_node_num_keys(root) = 1;
+    // 设置指向左孩子
+    *internal_node_child(root, 0) = left_child_page_num;
+    // 获取左孩子最大的key 当做root的key
+    uint32_t left_child_max_key = get_node_max_key(left_child);
+    *internal_node_key(root, 0) = left_child_max_key;
+    *internal_node_right_child(root) = right_child_page_num;
+
+
 }
 
 
