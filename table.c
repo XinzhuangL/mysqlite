@@ -255,8 +255,9 @@ Cursor* table_find(Table* table, uint32_t key) {
     if(get_node_type(root_node) == NODE_LEAF) {
         return leaf_node_find(table, root_page_num, key);
     }  else {
-        printf("Need to implement searching an internal node");
-        exit(EXIT_FAILURE);
+//        printf("Need to implement searching an internal node");
+//        exit(EXIT_FAILURE);
+        return internal_node_find(table, root_page_num, key);
     }
 
 }
@@ -395,6 +396,34 @@ void create_new_root(Table* table, uint32_t right_child_page_num) {
     uint32_t left_child_max_key = get_node_max_key(left_child);
     *internal_node_key(root, 0) = left_child_max_key;
     *internal_node_right_child(root) = right_child_page_num;
+}
+
+
+Cursor* internal_node_find(Table* table, uint32_t page_num, uint32_t key) {
+    void* node = get_page(table -> pager, page_num);
+    uint32_t nums_keys = *internal_node_num_keys(node);
+    // Binary search to find index of child to search
+    uint32_t min_idx = 0;
+    uint32_t max_idx = nums_keys; // one more child than key
+    // min_idx = max_idx = key
+    while (min_idx != max_idx) {
+        uint32_t index = (min_idx + max_idx) / 2;
+        uint32_t key_to_right = *internal_node_key(node, index);
+        if(key_to_right >= key) {
+            max_idx = index; // 向左找 或者相等 >=都算满足条件，代表有可能在孩子节点中包含
+        } else {
+            min_idx = index + 1; // 向右找
+        }
+    }
+
+    uint32_t child_num = *internal_node_child(node, min_idx);
+    void* child = get_page(table -> pager, child_num);
+    switch (get_node_type(child)) {
+        case NODE_LEAF:
+            return leaf_node_find(table, child_num, key);
+        case NODE_INTERNAL:
+            return internal_node_find(table, child_num, key);
+    }
 
 
 }

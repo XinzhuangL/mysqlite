@@ -86,5 +86,8 @@ uint32_t get_unused_page_num(Pager* pager);
 
 void create_new_root(Table* table, uint32_t right_child_page_num);
 
+// internal_node_find
+Cursor* internal_node_find(Table* table, uint32_t page_num, uint32_t key);
+
 
 #endif
